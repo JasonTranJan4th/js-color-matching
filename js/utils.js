@@ -1,5 +1,7 @@
 //hàm xáo trộn các ptu trong mảng
 
+import { getPlayAgainButton, getTimerElement } from "./selectors.js";
+
 function shuffle(arr) {
   if (!Array.isArray(arr) || arr.length <= 2) return arr; // arr.length <= 2: nếu arr có ít hơn 2 ptu thì ko cần hoán đổi, trả về arr hiện tại luôn
 
@@ -37,4 +39,22 @@ export const getRandomColorPairs = (count) => {
   shuffle(fullColorList);
 
   return fullColorList;
+}
+
+export function showPlayAgainButton() {
+  const playAgainButton = getPlayAgainButton();
+
+  if (playAgainButton) playAgainButton.classList.add('show');
+}
+
+export function hidePlayAgainButton() {
+  const playAgainButton = getPlayAgainButton();
+
+  if (playAgainButton) playAgainButton.classList.remove('show');
+}
+
+export function setTimerText(text) {
+  const timerEle = getTimerElement();
+
+  if (timerEle) timerEle.textContent = text;
 }
