@@ -58,3 +58,38 @@ export function setTimerText(text) {
 
   if (timerEle) timerEle.textContent = text;
 }
+
+export function createTimer({ seconds, onChange, onFinish }) {
+
+  let intervalId = null;
+
+  function start() {
+    //để chắc chắn rằng ko có nhiều setInterval đang chạy thì clear trc đã
+    clear();
+
+    let currentSecond = seconds;
+
+    intervalId = setInterval(() => {
+
+      if (onChange) onChange(currentSecond);// call callback
+
+      currentSecond--;
+
+      if (currentSecond < 0) {
+        clear();
+
+        if (onFinish) onFinish();
+      }
+
+    }, 1000);
+  }
+
+  function clear() {
+    clearInterval(intervalId);
+  }
+
+  return {
+    start,
+    clear
+  }
+}

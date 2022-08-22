@@ -1,10 +1,30 @@
-import { GAME_STATUS, PAIRS_COUNT } from './constants.js'
+import { GAME_STATUS, GAME_TIME, PAIRS_COUNT } from './constants.js'
 import { getColorElementList, getColorListElement, getInactiveColorList, getPlayAgainButton } from './selectors.js';
-import { getRandomColorPairs, hidePlayAgainButton, setTimerText, showPlayAgainButton } from './utils.js';
+import { createTimer, getRandomColorPairs, hidePlayAgainButton, setTimerText, showPlayAgainButton } from './utils.js';
 
 // Global variables
-let selections = [] // mảng lưu những ptu đã chọn
-let gameStatus = GAME_STATUS.PLAYING
+let selections = []; // mảng lưu những ptu đã chọn
+let gameStatus = GAME_STATUS.PLAYING;
+let timer = createTimer({
+    seconds: GAME_TIME,
+    onChange: handleOnChange,
+    onFinish: handleOnFinished
+});
+
+function handleOnChange(second) {
+    console.log('change', second);
+
+    //set timerText
+    const fullSecond = `0${second}`.slice(-2);
+    setTimerText(fullSecond);
+}
+
+function handleOnFinished() {
+    console.log('finished');
+
+    gameStatus = GAME_STATUS.FINISHED;
+    setTimerText('GameOver');
+}
 
 // TODOs
 // 1. Generating colors using https://github.com/davidmerfield/randomColor
@@ -15,7 +35,7 @@ let gameStatus = GAME_STATUS.PLAYING
 
 function handleColorClick(liELe) {
 
-    //check shouldBlocking vì khi click 3 ptu liên tiếp thì ptu 2 và 3 sẽ thực hiện đoạn setTimeout nhưng vì setTimeout của ptu 2 chạy trc và clear mảng selection cho nên khi setTimeout của pt3 chạy thì trong mảng ko có ptu để so sánh => lỗi
+    //check shouldBlocking vì khi click 3 ptu liên tiếp thì ptu 2 và 3 sẽ thực hiện đoạn setTimeout để check match nhưng vì setTimeout của ptu 2 chạy trc và clear mảng selection cho nên khi setTimeout của pt3 chạy thì trong mảng ko có ptu để so sánh => lỗi
     const shouldBlocking = [GAME_STATUS.BLOCKING, GAME_STATUS.FINISHED].includes(gameStatus);
 
     //isClicked để kiểm tra nếu thẻ li đó dc click r (dc thêm class active) thì khi click lại sẽ ko làm gì cả
@@ -47,6 +67,10 @@ function handleColorClick(liELe) {
             //show you win status
             setTimerText('You Win');
 
+            //clear timer (win rồi thi ko cần đếm thời gian chơi nữa)
+            timer.clear();
+
+            //thay đổi giá trị của gameStatus để check (win rồi thì ko cho ấn vào các pt nữa)
             gameStatus = GAME_STATUS.FINISHED;
         }
 
@@ -56,7 +80,7 @@ function handleColorClick(liELe) {
 
     //if not match
     //remove active class for 2 li ele
-    gameStatus = GAME_STATUS.BLOCKING;
+    gameStatus = GAME_STATUS.BLOCKING; // handle việc ko cho click thằng thứ 3. đợi nó kiểm tra xong (setTimeOut bên dưới) thì mới dc click tiếp
 
     setTimeout(() => {
         selections[0].classList.remove('active');
@@ -65,7 +89,10 @@ function handleColorClick(liELe) {
         //reset selections đẻ check cặp tiếp theo
         selections = [];
 
-        gameStatus = GAME_STATUS.PLAYING;
+        if (gameStatus !== GAME_STATUS.FINISHED) {
+            gameStatus = GAME_STATUS.PLAYING;
+        } // kiểm tra 
+
     }, 500); // sd setTimeout vì khi click ptu t2, kiểm tra ko match thì sẽ xóa class active liền cho nên ptu thứ 2 ko hiện màu 
 }
 
@@ -118,6 +145,9 @@ function resetGame() {
 
     //re-generate mảng màu mới 
     initColors();
+
+    //sau khi an reset thi cung restart lai timer
+    startTimer();
 }
 
 function attachEventForReplayButton() {
@@ -128,6 +158,10 @@ function attachEventForReplayButton() {
     playAgainButton.addEventListener('click', resetGame);
 }
 
+function startTimer() {
+    timer.start();
+}
+
 (() => {
 
     initColors();
@@ -136,4 +170,6 @@ function attachEventForReplayButton() {
 
 
     attachEventForReplayButton();
+
+    startTimer();
 })();
