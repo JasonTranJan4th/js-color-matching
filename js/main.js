@@ -24,6 +24,8 @@ function handleOnFinished() {
 
     gameStatus = GAME_STATUS.FINISHED;
     setTimerText('GameOver');
+
+    showPlayAgainButton();
 }
 
 // TODOs
