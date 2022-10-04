@@ -6,7 +6,7 @@ function shuffle(arr) {
   if (!Array.isArray(arr) || arr.length <= 2) return arr; // arr.length <= 2: nếu arr có ít hơn 2 ptu thì ko cần hoán đổi, trả về arr hiện tại luôn
 
   for (let i = arr.length - 1; i > 1; i--) {
-    const j = Math.floor(Math.random() * 1); //trả về j là 1 số < i hiện tại VD: i đang là 15 => trả về 1 số < 15
+    const j = Math.floor(Math.random() * i); //trả về j là 1 số < i hiện tại VD: i đang là 15 => trả về 1 số < 15
 
     //hoán đổi giá trị tại vị trí i thành giá trị tại vị trí j
     let temp = arr[i];
